@@ -1,0 +1,39 @@
+name: Two Jobs With Smart Parameter
+
+on:
+  workflow_dispatch:
+    inputs:
+      env_name:
+        description: "Write txt to run txt, otherwise nti will run"
+        required: false
+
+jobs:
+
+  build-job:
+    runs-on: self-hosted
+
+    steps:
+      - name: Checkout Source Code
+        uses: actions/checkout@v4
+
+      - name: Show Repo Info (Built-in)
+        run: |
+          git branch
+          git rev-parse HEAD
+
+  run-job:
+    runs-on: self-hosted
+    needs: build-job
+
+    steps:
+      - name: Decide What To Run
+        run: |
+          INPUT="${{ github.event.inputs.env_name }}"
+
+          if [ "$INPUT" = "txt" ]; then
+            echo "txt detected ✅"
+            echo "Running TXT environment..."
+          else
+            echo "Default selected ✅"
+            echo "Running NTI environment..."
+          fi
